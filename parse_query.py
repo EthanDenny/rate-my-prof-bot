@@ -43,9 +43,9 @@ def parse_query(query):
             html_doc = response.read()
             soup = BeautifulSoup(html_doc, 'html.parser')
             script_text = soup.body.script.text
-            json_index = script_text.find('window.__RELAY_STORE__ = ')
-            script_text = script_text[json_index + 25:]
-            script_text = script_text[:script_text.index('\n')-1]
+            json_index = script_text.index('window.__RELAY_STORE__')
+            script_text = script_text[json_index:]
+            script_text = script_text[script_text.index('{'):script_text.index(';')]
             j = json.loads(script_text)
 
             firstName = get_recursively(j, 'firstName')[0]
