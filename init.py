@@ -22,19 +22,23 @@ async def on_message(message):
 
         firstName, lastName, avgRating, wouldTakeAgainPercent, avgDifficulty = parse_query(query)
 
-        msg = ''
-
         if len(firstName) == 0:
-            msg = 'Sorry, I couldn\'t find that prof!'
+            await message.channel.send('Sorry, I couldn\'t find that prof!')
         else:
+            embed = discord.Embed(title='Professor Ratings')
+
             if len(firstName) > 1:
-                msg += 'Found several professors, here are the top results:\n\n'
+                embed.title = 'Professor Ratings'
+                embed.description = 'Found multiple professors, here are the top results:'
+            else:
+                embed.title = 'Professor Rating'
             
             for i in range(len(firstName)):
                 percent = max(wouldTakeAgainPercent[i], 0)
-                msg += f'{firstName[i]} {lastName[i]}: Average rating is {avgRating[i]} and {percent:.0f}% would take again, with an average difficulty of {avgDifficulty[i]}\n'
+                value = f'Average rating is {avgRating[i]} and {percent:.0f}% would take again, with an average difficulty of {avgDifficulty[i]}'
+                embed.add_field(name=f'{firstName[i]} {lastName[i]}', value=value, inline=False)
 
-        await message.channel.send(msg)
+            await message.channel.send(embed=embed)
 
 
 def main():
