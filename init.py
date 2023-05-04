@@ -20,13 +20,21 @@ async def on_message(message):
     if message.content.startswith('!ratemyprof '):
         query = message.content[12:].replace(' ', '+')
 
-        success, firstName, lastName, avgRating, wouldTakeAgainPercent, avgDifficulty = parse_query(query)
+        firstName, lastName, avgRating, wouldTakeAgainPercent, avgDifficulty = parse_query(query)
 
-        if success:
-            msg = f'{firstName} {lastName}: Average rating is {avgRating} and {wouldTakeAgainPercent}% would take again, with an average difficulty of {avgDifficulty}'
-            await message.channel.send(msg)
+        msg = ''
+
+        if len(firstName) == 0:
+            msg = 'Sorry, I couldn\'t find that prof!'
         else:
-            await message.channel.send('Sorry, I couldn\'t find that prof!')
+            if len(firstName) > 1:
+                msg += 'Found several professors, here are the top results:\n\n'
+            
+            for i in range(len(firstName)):
+                percent = max(wouldTakeAgainPercent[i], 0)
+                msg += f'{firstName[i]} {lastName[i]}: Average rating is {avgRating[i]} and {percent:.0f}% would take again, with an average difficulty of {avgDifficulty[i]}\n'
+
+        await message.channel.send(msg)
 
 
 def main():

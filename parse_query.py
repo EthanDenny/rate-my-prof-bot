@@ -38,23 +38,19 @@ def get_recursively(search_dict, field):
 
 
 def parse_query(query):
-    try:
-        with urlopen(URL_PREFIX + query) as response:
-            html_doc = response.read()
-            soup = BeautifulSoup(html_doc, 'html.parser')
-            script_text = soup.body.script.text
-            json_index = script_text.index('window.__RELAY_STORE__')
-            script_text = script_text[json_index:]
-            script_text = script_text[script_text.index('{'):script_text.index(';')]
-            j = json.loads(script_text)
+    with urlopen(URL_PREFIX + query) as response:
+        html_doc = response.read()
+        soup = BeautifulSoup(html_doc, 'html.parser')
+        script_text = soup.body.script.text
+        json_index = script_text.index('window.__RELAY_STORE__')
+        script_text = script_text[json_index:]
+        script_text = script_text[script_text.index('{'):script_text.index(';')]
+        j = json.loads(script_text)
 
-            firstName = get_recursively(j, 'firstName')[0]
-            lastName = get_recursively(j, 'lastName')[0]
-            avgRating = get_recursively(j, 'avgRating')[0]
-            wouldTakeAgainPercent = round(get_recursively(j, 'wouldTakeAgainPercent')[0], 2)
-            avgDifficulty = get_recursively(j, 'avgDifficulty')[0]
+        firstName = get_recursively(j, 'firstName')
+        lastName = get_recursively(j, 'lastName')
+        avgRating = get_recursively(j, 'avgRating')
+        wouldTakeAgainPercent = get_recursively(j, 'wouldTakeAgainPercent')
+        avgDifficulty = get_recursively(j, 'avgDifficulty')
 
-            return True, firstName, lastName, avgRating, wouldTakeAgainPercent, avgDifficulty
-    except Exception:
-        print(traceback.format_exc())
-        return False, None, None, None, None, None
+        return firstName, lastName, avgRating, wouldTakeAgainPercent, avgDifficulty
